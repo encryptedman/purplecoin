@@ -81,9 +81,11 @@ class p2p:
     connections = []
 
     def __init__(self):
-
         pass
 
     def Server_Start(self):
-        self.p2p_server.bind(('0.0.0.0', 45777))
+        self.p2p_server.bind(('0.0.0.0', config.SERVER_PORT))
         self.p2p_server.listen(1)
+
+    def Start_Client(self):
+        self.p2p_client.recv(8192)

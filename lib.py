@@ -33,27 +33,68 @@ def initExit():
     quit = input("Press Enter to exit...")
     sys.exit(0)
 
-def getOnlinePeer():
-    Initizaling = init.Init()
-    Initizaling.Start()
+# Classes
 
-    peers_list_connect = sqlite3.connect(config.PEERS_LIST_FILE)
-    peers_list_connect.row_factory = lambda cursor, row: row[0]
-    peers_list_cursor = peers_list_connect.cursor()
+class Peers:
+    def getOnlinePeer(self, peer=''):
+        Initizaling = init.Init()
+        Initizaling.Start()
 
-    for ip in peers_list_cursor.execute('SELECT `ip` FROM `peers` ORDER BY `id` DESC'):
-        if not checkIp(ip):
-            continue
-        print('Start - ' + ip)
-        peer = socket.socket()
-        peer.settimeout(2)
-        try:
-            peer.connect((ip, config.SERVER_PORT))
-            print('Success - ' + ip)
-            peers_list_connect.close()
-            return ip
-        except socket.error:
-            print('Error - ' + ip)
-            continue
+        peers_list_connect = sqlite3.connect(config.PEERS_LIST_FILE)
+        if peer == '':
+            peers_list_connect.row_factory = lambda cursor, row: row[0]
+            peers_list_cursor = peers_list_connect.cursor()
 
-    return 'offline'
+            for ip in peers_list_cursor.execute('SELECT `ip` FROM `peers` ORDER BY `id` DESC'):
+                if not checkIp(ip):
+                    continue
+                print('Start - ' + ip)
+                peer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                peer.settimeout(1)
+                try:
+                    peer.connect((ip, config.SERVER_PORT))
+                    peers_list_connect.close()
+                    print('Success - ' + ip)
+                    return ip
+                except socket.error:
+                    print('Error - ' + ip)
+                    continue
+
+            return 'offline'
+        else:
+            peers_list_cursor = peers_list_connect.cursor()
+
+            if not checkIp(peer):
+                return 'Wrong peer\'s ip'
+            print('Start - ' + peer)
+            connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            connection.settimeout(1)
+            try:
+                connection.connect((peer, config.SERVER_PORT))
+                peers_list_cursor.execute('''
+                    INSERT INTO `peers` VALUES(NULL, :ip);
+                ''', {'ip': peer})
+                peers_list_connect.commit()
+                peers_list_connect.close()
+                print('Success - ' + peer)
+                return peer
+            except socket.error:
+                print('Error - ' + peer)
+                return 'offline'
+
+class Listen_Commands:
+    def GetCommands(self, command):
+        commands = command.split(' ')
+        for i in range(5):
+            commands.append('')
+        return commands
+
+    def DoCommands(self, commands):
+        if commands[0] == 'help' or commands[0] == 'Help' or commands[0] == 'HELP':
+            print('\'Exit\' - Close the app')
+        elif commands[0] == 'exit' or commands[0] == 'Exit' or commands[0] == 'EXIT' or commands[0] == 'quit' or commands[0] == 'Quit' or commands[0] == 'QUIT':
+            initExit()
+        elif commands[0] == '':
+            print('Please input some command')
+        else:
+            print('Unknow command\nInput \'help\' to see all commands')
