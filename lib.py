@@ -4,7 +4,7 @@ import init
 import sqlite3
 import config
 import sys
-import json
+# import json
 import os
 import ipaddress
 
@@ -55,3 +55,5 @@ def getOnlinePeer():
         except socket.error:
             print('Error - ' + ip)
             continue
+
+    return 'offline'

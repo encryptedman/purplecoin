@@ -6,7 +6,7 @@ START_REWARD = '8192'
 REWARD_FIX = '210000'
 
 BLOCKCHAIN_FILE = 'blockchain.sqlite'
-PEERS_LIST_FILE = 'peers.sqlite'
+PEERS_LIST_FILE = 'settings.sqlite'
 
 SERVER_PORT = 45777
 

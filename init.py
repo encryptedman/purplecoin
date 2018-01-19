@@ -2,6 +2,8 @@ import sqlite3
 import os
 import config
 import lib
+import socket
+import queue
 
 class Init:
     # Creating clear tables
@@ -18,6 +20,14 @@ class Init:
             CREATE TABLE `peers` (
             	`id`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
             	`ip`	TEXT NOT NULL
+            );
+        ''')
+
+        peers_list_cursor.execute('''
+            CREATE TABLE `info` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+                `value` TEXT,
+                `int` INTEGER
             );
         ''')
 
@@ -63,3 +73,17 @@ class Init:
 
     def __init__(self):
         pass
+
+class p2p:
+    p2p_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    p2p_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    connections = []
+
+    def __init__(self):
+
+        pass
+
+    def Server_Start(self):
+        self.p2p_server.bind(('0.0.0.0', 45777))
+        self.p2p_server.listen(1)
